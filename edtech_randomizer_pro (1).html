@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Randomizer Pro - 8 Chế Độ Gọi Tên Ngẫu Nhiên</title>
+    <!-- Tailwind CSS CDN để xây dựng giao diện nhanh & responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Montserrat & Play -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Play:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        digital: ['Play', 'sans-serif'],
+                    },
+                    colors: {
+                        neonGreen: '#39FF14',
+                        neonOrange: '#FF5F1F',
+                        darkBg: '#0B0F19',
+                        darkCard: '#161B26',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(22, 27, 38, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF5F1F;
+            border-radius: 3px;
+        }
+        
+        /* Hiệu ứng nhấp nháy Neon */
+        .neon-border-green {
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3), inset 0 0 10px rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.5);
+        }
+        .neon-border-orange {
+            box-shadow: 0 0 10px rgba(255, 95, 31, 0.3), inset 0 0 10px rgba(255, 95, 31, 0.1);
+            border: 1px solid rgba(255, 95, 31, 0.5);
+        }
+        .text-neon-green {
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+        }
+        .text-neon-orange {
+            text-shadow: 0 0 8px rgba(255, 95, 31, 0.6);
+        }
+        
+        /* Chạy chữ tiêu đề */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Keyframe Hoạt Ảnh Vòng Quay */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hiệu ứng xúc xắc lắc */
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-2deg); }
+            20% { transform: translate(-3px, 0px) rotate(3deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-2deg); }
+            80% { transform: translate(-1px, -1px) rotate(3deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shaking {
+            animation: shake 0.15s infinite;
+        }
+
+        /* Hiệu ứng nổ bong bóng */
+        @keyframes bubblePop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        .bubble-pop {
+            animation: bubblePop 0.3s forwards;
+        }
+
+        /* Phong thư mở */
+        .envelope-top {
+            transition: transform 0.6s ease;
+            transform-origin: top;
+        }
+        .envelope-open .envelope-top {
+            transform: rotateX(180deg);
+            z-index: 5;
+        }
+        .letter-content {
+            transition: transform 0.6s ease 0.3s, opacity 0.5s ease 0.3s;
+        }
+        .envelope-open .letter-content {
+            transform: translateY(-50px);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-gray-200 min-h-screen font-sans transition-colors duration-300 overflow-x-hidden selection:bg-neonOrange selection:text-white">
+
+    <!-- Canvas dành cho pháo hoa hiệu ứng chúc mừng -->
+    <canvas id="fireworksCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- HEADER BAR -->
+    <header class="border-b border-gray-800 bg-darkCard/80 backdrop-blur sticky top-0 z-40 px-4 py-3 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- App Branding -->
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-neonOrange to-amber-500 p-2.5 rounded-xl shadow-lg shadow-neonOrange/20 animate-pulse">
+                    <i class="fa-solid fa-graduation-cap text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold tracking-wider bg-gradient-to-r from-neonOrange via-amber-400 to-neonGreen bg-clip-text text-transparent">
+                        EDTECH RANDOMIZER PRO
+                    </h1>
+                    <p class="text-xs text-gray-400 tracking-widest uppercase font-semibold">Hệ thống gọi tên thông minh • 8 chế độ</p>
+                </div>
+            </div>
+
+            <!-- Stats & Quick Controls -->
+            <div class="flex flex-wrap items-center justify-center gap-4 text-sm">
+                <!-- Sĩ số học sinh -->
+                <div class="bg-darkBg px-3 py-1.5 rounded-lg border border-gray-800 flex items-center gap-2">
+                    <span class="text-gray-400">Sĩ số:</span>
+                    <span id="statTotal" class="font-bold text-neonGreen font-digital text-lg">0</span>
+                </div>
+                <!-- Đã gọi -->
+                <div class="bg-darkBg px-3 py-1.5 rounded-lg border border-gray-800 flex items-center gap-2">
+                    <span class="text-gray-400">Đã gọi:</span>
+                    <span id="statCalled" class="font-bold text-neonOrange font-digital text-lg">0</span>
+                </div>
+
+                <!-- Tùy chỉnh chế độ không trùng lặp -->
+                <button id="btnToggleNoRepeat" onclick="toggleNoRepeat()" class="px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 transition-all duration-300 border border-neonGreen/30 bg-neonGreen/10 text-neonGreen">
+                    <i id="repeatIcon" class="fa-solid fa-rotate-left"></i>
+                    <span id="repeatText">Không trùng lặp: BẬT</span>
+                </button>
+
+                <!-- Audio Settings -->
+                <button id="btnSoundToggle" onclick="toggleSound()" class="w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 bg-gray-800/50 hover:bg-neonOrange/20 hover:border-neonOrange text-gray-300 hover:text-neonOrange transition-all duration-300" title="Bật/Tắt âm thanh">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="btnThemeToggle" onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 bg-gray-800/50 hover:bg-neonGreen/20 hover:border-neonGreen text-gray-300 hover:text-neonGreen transition-all duration-300" title="Chuyển chế độ Sáng/Tối">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[calc(100vh-80px)]">
+        
+        <!-- CỘT TRÁI: QUẢN LÝ LỚP & DANH SÁCH (Hệ số rộng: 3) -->
+        <section class="lg:col-span-3 flex flex-col gap-4">
+            <div class="bg-darkCard rounded-2xl p-4 border border-gray-800 shadow-xl flex-1 flex flex-col transition-colors duration-300">
+                <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
+                    <h2 class="font-bold text-neonOrange tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear"></i> QUẢN LÝ LỚP HỌC
+                    </h2>
+                    <span class="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full font-semibold">Cài đặt</span>
+                </div>
+
+                <!-- Input Danh sách -->
+                <div class="flex-1 flex flex-col gap-2 min-h-[250px]">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Danh sách học sinh (Mỗi dòng 1 tên):</label>
+                    <textarea id="studentInput" class="flex-1 w-full bg-darkBg text-gray-100 p-3 rounded-xl border border-gray-700 focus:border-neonOrange focus:ring-1 focus:ring-neonOrange outline-none font-medium text-sm resize-none transition-all" placeholder="Nhập tên học sinh vào đây..."></textarea>
+                </div>
+
+                <!-- Các nút tác vụ nhập/xuất -->
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <button onclick="loadSampleList()" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold text-xs py-2.5 px-2 rounded-xl transition duration-200 border border-gray-700 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-file-invoice"></i> Danh sách mẫu
+                    </button>
+                    <button onclick="clearStudentList()" class="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 font-semibold text-xs py-2.5 px-2 rounded-xl transition duration-200 border border-rose-900/50 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Xóa danh sách
+                    </button>
+                </div>
+
+                <!-- Import file và Cập nhật -->
+                <div class="mt-3 flex flex-col gap-2">
+                    <!-- Nút Tải File -->
+                    <label class="cursor-pointer bg-darkBg hover:bg-gray-800 border border-dashed border-gray-600 hover:border-neonGreen p-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-xs font-medium text-gray-300">
+                        <i class="fa-solid fa-cloud-arrow-up text-neonGreen text-sm animate-bounce"></i>
+                        <span>Tải file .TXT hoặc .CSV</span>
+                        <input type="file" id="fileImporter" accept=".txt,.csv" class="hidden" onchange="handleFileImport(event)">
+                    </label>
+
+                    <button onclick="updateStudentList()" class="w-full bg-gradient-to-r from-neonOrange to-amber-500 hover:from-neonOrange/90 hover:to-amber-500/90 text-white font-bold py-3 rounded-xl shadow-lg shadow-neonOrange/20 hover:shadow-neonOrange/40 transition duration-300 flex items-center justify-center gap-2 text-sm tracking-wider">
+                        <i class="fa-solid fa-circle-check"></i> CẬP NHẬT DANH SÁCH
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CỘT GIỮA: KHU VỰC CHẾ ĐỘ CHƠI VÀ PANEL TƯƠNG TÁC (Hệ số rộng: 6) -->
+        <section class="lg:col-span-6 flex flex-col gap-4">
+            
+            <!-- Bộ lọc/Tabs Trò chơi -->
+            <div class="bg-darkCard p-2 rounded-xl border border-gray-800 flex items-center justify-between gap-2 overflow-x-auto">
+                <span class="text-xs font-bold text-gray-400 px-3 uppercase whitespace-nowrap"><i class="fa-solid fa-gamepad text-neonGreen"></i> CHỌN CHẾ ĐỘ:</span>
+                <div class="flex items-center gap-1">
+                    <button onclick="changePlayMode('all')" id="tabMode-all" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-neonOrange text-white transition-all whitespace-nowrap">Tất cả</button>
+                    <button onclick="changePlayMode('classic')" id="tabMode-classic" class="text-xs font-bold px-3 py-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all whitespace-nowrap">Cổ điển</button>
+                    <button onclick="changePlayMode('interactive')" id="tabMode-interactive" class="text-xs font-bold px-3 py-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all whitespace-nowrap">Tương tác</button>
+                </div>
+            </div>
+
+            <!-- DANH SÁCH 8 CHẾ ĐỘ RANDOM (Màn hình lưới) -->
+            <div id="modesContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <!-- Chế độ 1: Vòng quay may mắn -->
+                <button onclick="selectGame(1)" id="cardGame-1" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-circle-notch text-xl animate-spin" style="animation-duration: 8s;"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">1. Vòng quay</span>
+                </button>
+
+                <!-- Chế độ 2: Đua vịt -->
+                <button onclick="selectGame(2)" id="cardGame-2" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-duck text-xl"><svg class="w-6 h-6 fill-current" viewBox="0 0 512 512"><path d="M472 256c0-39.2-16.7-74.6-43.5-99.5 3.5-12.8 5.5-26.2 5.5-40.1C434 52 382 4 318 4c-53 0-97.4 33-112.5 78.4C190.1 79.1 174.5 78 158 78c-44.2 0-80 35.8-80 80 0 17 5.3 32.7 14.3 45.7l-49.1 36.8C25.5 253.3 16 273.9 16 295.6V352c0 26.5 21.5 48 48 48h22.9C104.1 464.3 161.4 508 228 508c105.7 0 193-81.5 203.2-184.9 24.3-11.8 40.8-36.4 40.8-67.1zM158 110c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm30 186c-16.6 0-30-13.4-30-30s13.4-30 30-30 30 13.4 30 30-13.4 30-30 30z"/></svg></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">2. Đua vịt</span>
+                </button>
+
+                <!-- Chế độ 3: Máy Jackpot -->
+                <button onclick="selectGame(3)" id="cardGame-3" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-dice text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">3. Máy Jackpot</span>
+                </button>
+
+                <!-- Chế độ 4: Xúc xắc may rủi -->
+                <button onclick="selectGame(4)" id="cardGame-4" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-cube text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">4. Xúc xắc</span>
+                </button>
+
+                <!-- Chế độ 5: Phóng phi tiêu -->
+                <button onclick="selectGame(5)" id="cardGame-5" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-crosshairs text-xl animate-pulse"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">5. Phi tiêu</span>
+                </button>
+
+                <!-- Chế độ 6: Mưa tên -->
+                <button onclick="selectGame(6)" id="cardGame-6" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-cloud-showers-water text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">6. Mưa tên</span>
+                </button>
+
+                <!-- Chế độ 7: Bắn bong bóng -->
+                <button onclick="selectGame(7)" id="cardGame-7" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-circle text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">7. Bong bóng</span>
+                </button>
+
+                <!-- Chế độ 8: Thư bí ẩn -->
+                <button onclick="selectGame(8)" id="cardGame-8" class="bg-darkCard hover:bg-darkCard/80 border border-gray-800 hover:border-neonGreen p-3 rounded-xl flex flex-col items-center text-center gap-2 group transition-all duration-300 shadow-md">
+                    <div class="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-all">
+                        <i class="fa-solid fa-envelope text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xs group-hover:text-neonGreen transition-all">8. Thư bí ẩn</span>
+                </button>
+            </div>
+
+            <!-- BẢNG ĐIỀU KHIỂN & HIỂN THỊ CHƠI -->
+            <div class="bg-darkCard rounded-2xl p-4 border border-gray-800 flex-1 flex flex-col shadow-xl min-h-[420px] relative overflow-hidden transition-colors duration-300">
+                <!-- Header Game đang chọn -->
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-neonGreen animate-ping"></span>
+                        <h3 id="currentGameTitle" class="font-bold text-neonGreen uppercase text-sm tracking-widest">
+                            Chế độ: Vòng quay may mắn
+                        </h3>
+                    </div>
+                    <span class="text-xs text-gray-400" id="gameTypeTag">Mã: Game 1</span>
+                </div>
+
+                <!-- KHU VỰC THIÊN ĐƯỜNG TRỰC QUAN (Interactive Game Area) -->
+                <div id="gameViewport" class="flex-1 bg-darkBg rounded-xl border border-gray-800 relative flex items-center justify-center min-h-[300px] overflow-hidden">
+                    <!-- Nơi hiển thị các game động bằng canvas hoặc HTML -->
+                    <div id="gameCanvasContainer" class="absolute inset-0 w-full h-full flex items-center justify-center">
+                        <!-- Sẽ render động theo trò chơi -->
+                    </div>
+                </div>
+
+                <!-- Nút Hành Động Lớn -->
+                <div class="mt-4 flex gap-3">
+                    <button id="btnTriggerRandom" onclick="triggerRandomAction()" class="flex-1 bg-gradient-to-r from-neonGreen to-emerald-500 hover:from-neonGreen/90 hover:to-emerald-500/90 text-slate-900 font-extrabold py-3.5 px-6 rounded-xl text-lg tracking-widest shadow-lg shadow-neonGreen/20 hover:shadow-neonGreen/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-play text-xl"></i>
+                        <span>BẮT ĐẦU CHỌN</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CỘT PHẢI: LỊCH SỬ GỌI TÊN & TRẠNG THÁI (Hệ số rộng: 3) -->
+        <section class="lg:col-span-3 flex flex-col gap-4">
+            <!-- Lịch sử gọi -->
+            <div class="bg-darkCard rounded-2xl p-4 border border-gray-800 shadow-xl flex flex-col flex-1 max-h-[500px] lg:max-h-none transition-colors duration-300">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-3">
+                    <h2 class="font-bold text-neonGreen tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left"></i> LỊCH SỬ GỌI TÊN
+                    </h2>
+                    <button onclick="clearHistory()" class="text-xs hover:text-neonOrange text-gray-500 font-semibold transition" title="Xóa lịch sử">
+                        Xóa lịch sử
+                    </button>
+                </div>
+
+                <!-- List hiển thị lịch sử -->
+                <div id="historyList" class="flex-1 overflow-y-auto space-y-2 pr-1 min-h-[150px]">
+                    <!-- Placeholder khi trống -->
+                    <div id="historyPlaceholder" class="h-full flex flex-col items-center justify-center text-center text-gray-600 py-8">
+                        <i class="fa-solid fa-ghost text-4xl mb-2"></i>
+                        <p class="text-xs">Chưa có lượt gọi nào trong phiên này</p>
+                    </div>
+                </div>
+
+                <!-- Thống kê nhỏ bên dưới lịch sử -->
+                <div class="border-t border-gray-800 pt-3 mt-3">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mb-1">Trạng thái hệ thống</p>
+                    <div class="text-xs text-gray-400 flex items-center justify-between bg-darkBg p-2 rounded-lg">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Offline Mode
+                        </span>
+                        <span id="systemTime" class="font-mono">18:00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- BANNER CHẠY TIN TỨC CUỐI TRANG -->
+    <footer class="border-t border-gray-900 bg-black/40 py-2.5 px-4 overflow-hidden relative">
+        <div class="flex items-center gap-4 text-xs">
+            <span class="bg-neonOrange text-white font-extrabold px-2 py-0.5 rounded text-[10px] uppercase shrink-0">HƯỚNG DẪN</span>
+            <div class="relative w-full overflow-hidden h-4">
+                <div class="absolute whitespace-nowrap animate-[marquee_20s_linear_infinite] hover:[animation-play-state:paused] text-gray-400">
+                    💡 Nhập danh sách học sinh (Mỗi dòng 1 tên) và nhấn <span class="text-neonGreen">Cập nhật</span> trước khi chọn trò chơi. Sử dụng nút <span class="text-neonOrange">Không trùng lặp</span> để đảm bảo học sinh không bị gọi lại 2 lần. Nhấn phím Cách (Space) để kích hoạt quay nhanh cực tiện lợi!
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL POPUP HIỂN THỊ KẾT QUẢ CỰC ĐẠI CHÚC MỪNG -->
+    <div id="winnerModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="scale-90 opacity-0 transition-all duration-500 max-w-xl w-full mx-4 bg-darkCard border-2 border-neonGreen rounded-3xl p-8 text-center relative shadow-2xl shadow-neonGreen/20" id="winnerModalCard">
+            
+            <!-- Đèn nhấp nháy góc -->
+            <span class="absolute top-4 left-4 w-3 h-3 rounded-full bg-neonGreen animate-ping"></span>
+            <span class="absolute top-4 right-4 w-3 h-3 rounded-full bg-neonOrange animate-ping"></span>
+
+            <!-- Vương miện -->
+            <div class="text-amber-400 text-6xl mb-4 animate-bounce">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+
+            <!-- Tên Chế Độ / Khẩu hiệu -->
+            <h4 class="text-neonOrange uppercase font-bold text-sm tracking-widest mb-2" id="modalSubTitle">HỌC SINH ĐÃ CHỌN</h4>
+            
+            <!-- TÊN HỌC SINH ĐƯỢC CHỌN (Phông chữ siêu to) -->
+            <div class="bg-darkBg py-8 px-4 rounded-2xl border border-gray-800 mb-6 flex items-center justify-center min-h-[140px] shadow-inner">
+                <h1 id="modalWinnerName" class="text-4xl md:text-6xl font-black tracking-wider text-neonGreen text-neon-green break-words w-full">
+                    NGUYỄN VĂN A
+                </h1>
+            </div>
+
+            <p class="text-gray-400 text-xs mb-6">Nhấn phím bất kỳ hoặc nhấn nút bên dưới để tiếp tục buổi học</p>
+
+            <!-- Nút đóng -->
+            <button onclick="closeWinnerModal()" class="w-full bg-gradient-to-r from-neonGreen to-emerald-500 hover:from-neonGreen/90 hover:to-emerald-500/90 text-slate-950 font-black py-4 px-8 rounded-xl text-lg tracking-widest transition duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-neonGreen/20">
+                TIẾP TỤC HỌC <i class="fa-solid fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT HỆ THỐNG PHẦN MỀM -->
+    <script>
+        /* ==================== QUẢN LÝ TRẠNG THÁI (STATE) ==================== */
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'edtech-randomizer-pro';
+        
+        // Danh sách học sinh mẫu (10 em)
+        const defaultStudents = [
+            "Nguyễn Hoàng Long",
+            "Trần Thị Minh Thư",
+            "Phạm Minh Quân",
+            "Lê Hải Yến",
+            "Hoàng Gia Bảo",
+            "Vũ Thùy Dương",
+            "Đặng Quốc Khánh",
+            "Bùi Khánh Linh",
+            "Đỗ Minh Triết",
+            "Nguyễn Ngọc Mai"
+        ];
+
+        let state = {
+            students: [],          // Toàn bộ học sinh trong lớp
+            history: [],           // Lịch sử lượt gọi [ {name, time, gameMode} ]
+            calledIds: [],         // Danh sách các tên đã được gọi trong vòng lặp hiện tại
+            noRepeat: true,        // Chế độ không trùng lặp
+            soundEnabled: true,    // Âm thanh
+            darkMode: true,        // Giao diện tối/sáng
+            selectedGameId: 1,     // Game đang chọn (1 -> 8)
+            isRunning: false       // Lock không cho kích hoạt đồng thời
+        };
+
+        // Biến môi trường âm thanh (Web Audio API)
+        let audioCtx = null;
+
+        /* ==================== KHỞI CHẠY KHU VỰC VẬT LÝ VÀ CHƠI ==================== */
+        window.addEventListener('load', () => {
+            loadStateFromLocalStorage();
+            initializeUI();
+            selectGame(state.selectedGameId);
+            updateSystemClock();
+            setInterval(updateSystemClock, 1000);
+
+            // Bắt sự kiện phím Space để bấm bắt đầu quay nhanh
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    // Nếu đang không focus vào ô nhập văn bản
+                    if (document.activeElement !== document.getElementById('studentInput')) {
+                        e.preventDefault();
+                        if (document.getElementById('winnerModal').classList.contains('pointer-events-none')) {
+                            triggerRandomAction();
+                        } else {
+                            closeWinnerModal();
+                        }
+                    }
+                }
+            });
+        });
+
+        function updateSystemClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('systemTime').textContent = timeStr;
+        }
+
+        /* ==================== WEB AUDIO API (Offline Synthesizer) ==================== */
+        // Tạo âm thanh động bằng mã code, không cần file nhạc mp3 bên ngoài để chạy mượt 100% offline
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSoundEffects(type) {
+            if (!state.soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const now = audioCtx.currentTime;
+                if (type === 'tick') {
+                    // Âm thanh tick-tick khi quay xúc xắc/jackpot
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(now + 0.1);
+                } 
+                else if (type === 'drumroll') {
+                    // Âm thanh dồn trống kịch tính
+                    const bufferSize = audioCtx.sampleRate * 0.5; // 0.5s dồn dập
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const noiseFilter = audioCtx.createBiquadFilter();
+                    noiseFilter.type = 'bandpass';
+                    noiseFilter.frequency.value = 150;
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.3, now);
+                    noiseGain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    noise.connect(noiseFilter);
+                    noiseFilter.connect(noiseGain);
+                    noiseGain.connect(audioCtx.destination);
+                    noise.start();
+                }
+                else if (type === 'win') {
+                    // Hợp âm chiến thắng rực rỡ
+                    const notes = [261.63, 329.63, 392.00, 523.25]; // Đồ, Mi, Son, Đố
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        gain.gain.setValueAtTime(0, now);
+                        gain.gain.linearRampToValueAtTime(0.2, now + idx * 0.1 + 0.05);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.1 + 0.5);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.6);
+                    });
+                }
+                else if (type === 'pop') {
+                    // Âm thanh bóc bong bóng
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1600, now + 0.08);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(now + 0.08);
+                }
+                else if (type === 'launch') {
+                    // Tiếng phi tiêu phóng vèo
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(now + 0.2);
+                }
+            } catch (err) {
+                console.log("Audio Error:", err);
+            }
+        }
+
+        /* ==================== LOCAL STORAGE & STATE MANAGEMENT ==================== */
+        function loadStateFromLocalStorage() {
+            try {
+                const savedState = localStorage.getItem(`${appId}-state`);
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    state.students = parsed.students || [];
+                    state.history = parsed.history || [];
+                    state.calledIds = parsed.calledIds || [];
+                    state.noRepeat = parsed.noRepeat !== undefined ? parsed.noRepeat : true;
+                    state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+                    state.darkMode = parsed.darkMode !== undefined ? parsed.darkMode : true;
+                    state.selectedGameId = parsed.selectedGameId || 1;
+                } else {
+                    // Lần đầu tải dùng dữ liệu mẫu
+                    state.students = [...defaultStudents];
+                }
+            } catch (e) {
+                state.students = [...defaultStudents];
+            }
+        }
+
+        function saveStateToLocalStorage() {
+            try {
+                localStorage.setItem(`${appId}-state`, JSON.stringify(state));
+            } catch (e) {
+                console.warn("Storage Full hoặc Cookie bị tắt.");
+            }
+        }
+
+        function initializeUI() {
+            // Hiển thị giao diện danh sách
+            document.getElementById('studentInput').value = state.students.join('\n');
+            
+            // Cài đặt ban đầu cho nút "Không trùng lặp"
+            updateNoRepeatBtnUI();
+            
+            // Cài đặt ban đầu cho theme
+            if (!state.darkMode) {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.add('bg-slate-100', 'text-slate-800');
+                document.body.classList.remove('bg-darkBg', 'text-gray-200');
+                document.getElementById('themeIcon').className = "fa-solid fa-sun";
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Đồng bộ âm thanh
+            updateSoundIconUI();
+
+            // Refresh thống kê và lịch sử
+            refreshStats();
+            renderHistory();
+        }
+
+        /* ==================== ĐIỀU CHỈNH GIAO DIỆN (UI CONTROLS) ==================== */
+        function toggleTheme() {
+            state.darkMode = !state.darkMode;
+            const icon = document.getElementById('themeIcon');
+            if (state.darkMode) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.remove('bg-slate-100', 'text-slate-800');
+                document.body.classList.add('bg-darkBg', 'text-gray-200');
+                icon.className = "fa-solid fa-moon";
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('bg-darkBg', 'text-gray-200');
+                document.body.classList.add('bg-slate-100', 'text-slate-800');
+                icon.className = "fa-solid fa-sun";
+            }
+            saveStateToLocalStorage();
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            updateSoundIconUI();
+            saveStateToLocalStorage();
+            if (state.soundEnabled) {
+                initAudio();
+                playSoundEffects('tick');
+            }
+        }
+
+        function updateSoundIconUI() {
+            const icon = document.getElementById('soundIcon');
+            if (state.soundEnabled) {
+                icon.className = "fa-solid fa-volume-high text-neonOrange";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-gray-500";
+            }
+        }
+
+        function toggleNoRepeat() {
+            state.noRepeat = !state.noRepeat;
+            updateNoRepeatBtnUI();
+            
+            // Nếu tắt chế độ không trùng lặp, ta dọn sạch danh sách đã gọi để giải phóng
+            if (!state.noRepeat) {
+                state.calledIds = [];
+            }
+            saveStateToLocalStorage();
+            refreshStats();
+        }
+
+        function updateNoRepeatBtnUI() {
+            const btn = document.getElementById('btnToggleNoRepeat');
+            const text = document.getElementById('repeatText');
+            const icon = document.getElementById('repeatIcon');
+            if (state.noRepeat) {
+                btn.className = "px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 transition-all duration-300 border border-neonGreen/30 bg-neonGreen/10 text-neonGreen";
+                text.textContent = "Không trùng lặp: BẬT";
+                icon.className = "fa-solid fa-circle-check";
+            } else {
+                btn.className = "px-3 py-1.5 rounded-lg font-semibold flex items-center gap-2 transition-all duration-300 border border-gray-600 bg-gray-800/40 text-gray-400";
+                text.textContent = "Không trùng lặp: TẮT";
+                icon.className = "fa-solid fa-circle-xmark";
+            }
+        }
+
+        /* ==================== DANH SÁCH HỌC SINH TÁC VỤ ==================== */
+        function loadSampleList() {
+            document.getElementById('studentInput').value = defaultStudents.join('\n');
+            updateStudentList();
+        }
+
+        function clearStudentList() {
+            document.getElementById('studentInput').value = '';
+            state.students = [];
+            state.calledIds = [];
+            state.history = [];
+            saveStateToLocalStorage();
+            refreshStats();
+            renderHistory();
+            alertMessage("Đã dọn dẹp sạch danh sách học sinh lớp!", "success");
+        }
+
+        function updateStudentList() {
+            const val = document.getElementById('studentInput').value;
+            const names = val.split('\n')
+                .map(n => n.trim())
+                .filter(n => n.length > 0);
+            
+            state.students = names;
+            // Reset các học sinh đã gọi vì cấu trúc lớp đã thay đổi
+            state.calledIds = [];
+            
+            saveStateToLocalStorage();
+            refreshStats();
+            
+            // Vẽ lại Game đang chọn để cập nhật danh sách tên mới
+            selectGame(state.selectedGameId);
+
+            alertMessage(`Cập nhật thành công! Đã ghi nhận ${names.length} học sinh.`, "success");
+        }
+
+        function handleFileImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result;
+                // Xử lý các định dạng csv/txt, tách theo dòng hoặc dấu phẩy
+                let names = [];
+                if (file.name.endsWith('.csv')) {
+                    // Split theo dòng, bỏ dòng đầu nếu có header hoặc cứ split thông thường
+                    names = text.split(/[\r\n]+/)
+                        .map(n => n.trim())
+                        .filter(n => n.length > 0);
+                } else {
+                    names = text.split('\n')
+                        .map(n => n.trim())
+                        .filter(n => n.length > 0);
+                }
+
+                // Cập nhật text area
+                document.getElementById('studentInput').value = names.join('\n');
+                updateStudentList();
+            };
+            reader.readAsText(file);
+        }
+
+        function refreshStats() {
+            document.getElementById('statTotal').textContent = state.students.length;
+            
+            // Số lượng học sinh đã gọi tính dựa trên độ dài của history của phiên hiện tại hoặc danh sách calledIds
+            document.getElementById('statCalled').textContent = state.calledIds.length;
+        }
+
+        function alertMessage(msg, type = "info") {
+            // Thay thế hàm alert() bằng thông báo nhẹ nhàng ở góc màn hình tránh treo Iframe
+            const box = document.createElement('div');
+            box.className = `fixed bottom-16 right-4 z-50 p-4 rounded-xl text-white font-bold shadow-lg transition-all transform translate-y-10 opacity-0 flex items-center gap-2 ${
+                type === 'success' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 border border-emerald-400' : 'bg-gradient-to-r from-neonOrange to-red-600 border border-neonOrange/50'
+            }`;
+            box.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation'}"></i> <span>${msg}</span>`;
+            document.body.appendChild(box);
+            
+            // Animation in
+            setTimeout(() => {
+                box.classList.remove('translate-y-10', 'opacity-0');
+            }, 50);
+
+            // Out
+            setTimeout(() => {
+                box.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => box.remove(), 500);
+            }, 3000);
+        }
+
+        /* ==================== LỊCH SỬ GỌI TÊN ==================== */
+        function addHistory(name, gameName) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const item = {
+                name: name,
+                time: timeStr,
+                gameMode: gameName
+            };
+
+            state.history.unshift(item); // Thêm lên đầu danh sách
+            
+            // Giới hạn lưu 50 lượt gọi để tối ưu bộ nhớ
+            if (state.history.length > 50) {
+                state.history.pop();
+            }
+
+            saveStateToLocalStorage();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const placeholder = document.getElementById('historyPlaceholder');
+            
+            if (state.history.length === 0) {
+                placeholder.classList.remove('hidden');
+                // clear bớt list con nếu có
+                const oldItems = list.querySelectorAll('.history-item');
+                oldItems.forEach(el => el.remove());
+                return;
+            }
+
+            placeholder.classList.add('hidden');
+            
+            // Render danh sách
+            list.innerHTML = state.history.map(item => `
+                <div class="history-item bg-darkBg border border-gray-800 p-2.5 rounded-xl flex items-center justify-between hover:border-neonOrange/50 transition-all">
+                    <div>
+                        <p class="font-bold text-gray-200 text-sm">${item.name}</p>
+                        <p class="text-[10px] text-gray-500 flex items-center gap-1">
+                            <i class="fa-solid fa-tag"></i> ${item.gameMode}
+                        </p>
+                    </div>
+                    <span class="text-xs font-mono font-bold bg-gray-800 text-neonOrange px-2 py-1 rounded-lg">
+                        ${item.time}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            state.history = [];
+            state.calledIds = [];
+            saveStateToLocalStorage();
+            refreshStats();
+            renderHistory();
+            alertMessage("Đã xóa toàn bộ lịch sử gọi tên!", "success");
+        }
+
+        /* ==================== ĐIỀU PHỐI CHẾ ĐỘ CHƠI (TABS CHỌN GAME) ==================== */
+        function changePlayMode(filter) {
+            // Cập nhật tab active
+            const tabs = ['all', 'classic', 'interactive'];
+            tabs.forEach(tab => {
+                const el = document.getElementById(`tabMode-${tab}`);
+                if (tab === filter) {
+                    el.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-neonOrange text-white transition-all whitespace-nowrap";
+                } else {
+                    el.className = "text-xs font-bold px-3 py-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all whitespace-nowrap";
+                }
+            });
+
+            // Lọc các game card tương ứng
+            // Classic: Vòng quay, Jackpot, Xúc xắc, Mưa tên
+            // Interactive: Đua vịt, Phi tiêu, Bong bóng, Thư bí ẩn
+            const classicIds = [1, 3, 4, 6];
+            const interactiveIds = [2, 5, 7, 8];
+
+            for (let id = 1; id <= 8; id++) {
+                const card = document.getElementById(`cardGame-${id}`);
+                if (filter === 'all') {
+                    card.classList.remove('hidden');
+                } else if (filter === 'classic') {
+                    if (classicIds.includes(id)) card.classList.remove('hidden');
+                    else card.classList.add('hidden');
+                } else if (filter === 'interactive') {
+                    if (interactiveIds.includes(id)) card.classList.remove('hidden');
+                    else card.classList.add('hidden');
+                }
+            }
+        }
+
+        function selectGame(gameId) {
+            if (state.isRunning) return; // Không cho phép đổi game khi đang quay dở
+            
+            state.selectedGameId = gameId;
+            saveStateToLocalStorage();
+
+            // Highlight Game đang chọn
+            for (let i = 1; i <= 8; i++) {
+                const card = document.getElementById(`cardGame-${i}`);
+                if (i === gameId) {
+                    card.classList.add('border-neonGreen', 'bg-neonGreen/5');
+                    card.classList.remove('border-gray-800');
+                } else {
+                    card.classList.remove('border-neonGreen', 'bg-neonGreen/5');
+                    card.classList.add('border-gray-800');
+                }
+            }
+
+            // Đổi mô tả tiêu đề
+            const titles = {
+                1: "Chế độ: Vòng quay may mắn",
+                2: "Chế độ: Đường đua Vịt vàng",
+                3: "Chế độ: Máy Jackpot sầm uất",
+                4: "Chế độ: Đổ Xúc xắc may rủi",
+                5: "Chế độ: Phóng phi tiêu chuyên nghiệp",
+                6: "Chế độ: Cơn mưa danh sách học sinh",
+                7: "Chế độ: Bắn bóng bay tìm tên",
+                8: "Chế độ: Phong thư bí mật thần kỳ"
+            };
+            document.getElementById('currentGameTitle').textContent = titles[gameId];
+            document.getElementById('gameTypeTag').textContent = `Mã: Game ${gameId}`;
+
+            // Vẽ nội dung tĩnh ban đầu của game
+            renderStaticGame(gameId);
+        }
+
+        /* ==================== VẼ CƠ CHẾ CÁC TRÒ CHƠI (RENDER STATIC GAME) ==================== */
+        function renderStaticGame(gameId) {
+            const container = document.getElementById('gameCanvasContainer');
+            container.innerHTML = ''; // Clear viewport
+
+            if (state.students.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-6">
+                        <i class="fa-solid fa-users-slash text-5xl text-rose-500 mb-3 animate-bounce"></i>
+                        <h4 class="font-bold text-gray-300">Không có dữ liệu học sinh</h4>
+                        <p class="text-xs text-gray-500 mt-1 max-w-xs mx-auto">Vui lòng nhập danh sách lớp hoặc nhấp vào nút "Danh sách mẫu" ở cột bên trái!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            switch(gameId) {
+                case 1: // VÒNG QUAY MAY MẮN
+                    container.innerHTML = `
+                        <div class="relative w-[280px] h-[280px] flex items-center justify-center">
+                            <!-- Kim chỉ ở đầu -->
+                            <div class="absolute top-0 z-20 text-neonOrange text-3xl transform -translate-y-3">
+                                <i class="fa-solid fa-caret-down text-neonOrange drop-shadow-[0_0_5px_#FF5F1F]"></i>
+                            </div>
+                            <canvas id="wheelCanvas" width="280" height="280" class="rounded-full shadow-2xl transition-transform duration-100"></canvas>
+                        </div>
+                    `;
+                    drawWheel();
+                    break;
+
+                case 2: // ĐUA VỊT
+                    container.innerHTML = `
+                        <div class="w-full h-full p-4 flex flex-col justify-between" id="duckRaceTrack">
+                            <div class="text-xs text-center font-bold text-neonOrange tracking-widest animate-pulse">
+                                <i class="fa-solid fa-flag-checkered"></i> ĐƯỜNG ĐUA TRƯỜNG HỌC <i class="fa-solid fa-flag-checkered"></i>
+                            </div>
+                            <!-- Khu vực chạy các làn đua -->
+                            <div class="flex-1 flex flex-col justify-around gap-1 my-3 bg-black/40 p-2 rounded-xl border border-gray-800" id="duckLanes">
+                                <!-- Vịt tĩnh tượng trưng sẽ tự render -->
+                            </div>
+                            <div class="w-full text-center text-[10px] text-indigo-400">Ấn nút "Bắt đầu chọn" để khởi tranh</div>
+                        </div>
+                    `;
+                    renderDuckLanes(false);
+                    break;
+
+                case 3: // MÁY JACKPOT
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center gap-4 w-full">
+                            <div class="flex items-center gap-2 bg-black/60 p-4 rounded-2xl border-4 border-amber-500 shadow-xl w-[280px] justify-center relative overflow-hidden">
+                                <!-- Thanh cuốn -->
+                                <div class="h-16 overflow-hidden relative flex items-center justify-center w-full bg-slate-950 rounded-lg">
+                                    <div id="jackpotContainer" class="flex flex-col items-center absolute transition-all" style="top: 0px;">
+                                        <div class="h-16 flex items-center justify-center font-bold text-lg text-neonGreen font-digital uppercase px-4 whitespace-nowrap">??? SẴN SÀNG ???</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium">Hiệu ứng quay thưởng Slot Machine kịch tính!</p>
+                        </div>
+                    `;
+                    break;
+
+                case 4: // XÚC XẮC MAY RỦI
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center gap-4">
+                            <div id="dice3D" class="w-24 h-24 bg-gradient-to-tr from-white to-gray-200 border-2 border-slate-300 rounded-2xl shadow-2xl flex items-center justify-center text-5xl text-slate-800 transition-transform duration-200">
+                                <i class="fa-solid fa-dice-five"></i>
+                            </div>
+                            <div id="diceWinnerName" class="text-center font-bold text-xl text-neonGreen h-8 mt-2 transition-all duration-300 opacity-65 scale-95">
+                                Đang chờ đổ xúc xắc...
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 5: // PHÓNG PHI TIÊU
+                    container.innerHTML = `
+                        <div class="relative w-[280px] h-[280px] flex items-center justify-center">
+                            <!-- Bảng tiêu -->
+                            <div class="absolute inset-0 rounded-full border-4 border-emerald-500 bg-emerald-950/20 shadow-2xl flex items-center justify-center" id="dartboardRing">
+                                <div class="w-48 h-48 rounded-full border-4 border-dashed border-red-500 flex items-center justify-center">
+                                    <div class="w-24 h-24 rounded-full bg-red-600 border-4 border-white flex items-center justify-center shadow-lg">
+                                        <div class="w-6 h-6 rounded-full bg-yellow-400"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Phi tiêu hoạt ảnh bay -->
+                            <div id="dartProjectile" class="absolute z-10 text-4xl text-yellow-500 transform translate-y-36 translate-x-[-120px] rotate-45 opacity-0 transition-all duration-300">
+                                <i class="fa-solid fa-location-arrow"></i>
+                            </div>
+                            <span class="absolute text-xs font-bold text-emerald-400 bottom-2 bg-black/60 px-2 py-0.5 rounded-lg border border-emerald-800">BẢNG BIA PHI TIÊU</span>
+                        </div>
+                    `;
+                    break;
+
+                case 6: // MƯA TÊN HỌC SINH
+                    container.innerHTML = `
+                        <div class="w-full h-full p-4 flex flex-col justify-between relative" id="rainContainer">
+                            <div class="flex flex-wrap justify-center gap-2 max-h-[220px] overflow-hidden opacity-60 text-xs" id="rainNamesList">
+                                <!-- Chứa các đám mây tên bay nhẹ nhàng -->
+                            </div>
+                            <div class="text-center text-xs text-neonGreen font-bold animate-pulse">Sắp rơi đầy màn hình!</div>
+                        </div>
+                    `;
+                    renderRainStatic();
+                    break;
+
+                case 7: // BẮN BONG BÓNG
+                    container.innerHTML = `
+                        <div class="w-full h-full p-4 flex flex-col justify-between" id="bubbleYard">
+                            <div class="flex-1 grid grid-cols-4 gap-2 relative items-center justify-center" id="bubbleGrid">
+                                <!-- Sẽ tự động đổ bong bóng theo số lượng học sinh -->
+                            </div>
+                            <div class="text-center text-xs text-pink-400 font-bold mt-2">Nổ bóng chứa điều bất ngờ!</div>
+                        </div>
+                    `;
+                    renderBubbleGrid(false);
+                    break;
+
+                case 8: // THƯ BÍ ẨN
+                    container.innerHTML = `
+                        <div class="flex flex-col items-center justify-center w-full h-full p-4">
+                            <!-- Mô phỏng phong bì thư -->
+                            <div id="envelopeWrapper" class="relative w-48 h-32 bg-amber-600 border-2 border-amber-800 rounded-lg shadow-xl flex items-center justify-center overflow-visible transition-all duration-500">
+                                <!-- Nắp thư phía trên -->
+                                <div class="absolute top-0 left-0 right-0 h-0 border-l-[96px] border-l-transparent border-r-[96px] border-r-transparent border-t-[60px] border-t-amber-700 origin-top transition-transform duration-500 z-10" id="envelopeCap"></div>
+                                <i class="fa-solid fa-envelope text-white text-4xl drop-shadow"></i>
+                                
+                                <!-- Mảnh giấy bên trong -->
+                                <div id="secretLetter" class="absolute bg-white text-slate-900 font-bold p-3 rounded-md shadow-md text-center border border-gray-300 w-[90%] opacity-0 transform translate-y-2 z-0 text-xs whitespace-nowrap transition-all duration-500">
+                                    Thư Bí Mật
+                                </div>
+                            </div>
+                            <p class="text-xs text-amber-500 font-bold mt-4 animate-pulse">Một bức thư bí ẩn sắp được mở!</p>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        /* ==================== VẼ ĐỒ HỌA TRONG CÁC GAME ==================== */
+        
+        // GAME 1: Vẽ vòng quay Wheel
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const cw = canvas.width;
+            const ch = canvas.height;
+            const center = cw / 2;
+
+            // Xác định danh sách học sinh cần vẽ
+            const list = state.students.length > 0 ? state.students : ["Chưa có"];
+            const arc = (2 * Math.PI) / list.length;
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            // Bảng màu đẹp đẽ
+            const colors = [
+                '#FF5F1F', '#1F51FF', '#39FF14', '#FF007F', 
+                '#8A2BE2', '#00FFFF', '#FFD700', '#FF4500'
+            ];
+
+            for (let i = 0; i < list.length; i++) {
+                const angle = i * arc;
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, center - 10, angle, angle + arc);
+                ctx.lineTo(center, center);
+                ctx.fill();
+
+                // Viết chữ
+                ctx.save();
+                ctx.fillStyle = '#000000';
+                if (colors[i % colors.length] === '#1F51FF' || colors[i % colors.length] === '#8A2BE2') {
+                    ctx.fillStyle = '#FFFFFF';
+                }
+                ctx.font = 'bold 10px Montserrat';
+                ctx.translate(center, center);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = 'right';
+                // Cắt ngắn tên nếu quá dài
+                let label = list[i];
+                if (label.length > 12) label = label.substring(0, 10) + "..";
+                ctx.fillText(label, center - 20, 4);
+                ctx.restore();
+            }
+
+            // Tâm vòng tròn màu tối làm điểm nhấn
+            ctx.beginPath();
+            ctx.fillStyle = '#0F172A';
+            ctx.arc(center, center, 25, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#FF5F1F';
+            ctx.stroke();
+
+            // Vẽ logo ngôi sao vàng ở giữa
+            ctx.beginPath();
+            ctx.fillStyle = '#FFD700';
+            ctx.font = '12px FontAwesome';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', center, center);
+        }
+
+        // GAME 2: Vẽ các chú Vịt
+        function renderDuckLanes(isRacing = false) {
+            const lanesContainer = document.getElementById('duckLanes');
+            if (!lanesContainer) return;
+            lanesContainer.innerHTML = '';
+
+            const list = state.students.slice(0, 8); // Tối đa hiển thị 8 chú vịt đua trực quan
+            if (list.length === 0) return;
+
+            list.forEach((name, i) => {
+                lanesContainer.innerHTML += `
+                    <div class="relative w-full h-8 bg-slate-900/60 rounded-lg flex items-center border border-gray-800 overflow-hidden">
+                        <!-- Đường line mờ phân biệt làn đua -->
+                        <span class="absolute left-2 text-[10px] text-gray-600">Làn ${i+1}</span>
+                        
+                        <!-- Chú vịt -->
+                        <div id="duckItem-${i}" class="absolute left-10 flex items-center gap-1.5 transition-all duration-100 ease-out">
+                            <div class="text-yellow-400 text-xl animate-bounce" style="animation-duration: ${0.4 + i*0.1}s">
+                                <i class="fa-solid fa-duck"><svg class="w-5 h-5 fill-current" viewBox="0 0 512 512"><path d="M472 256c0-39.2-16.7-74.6-43.5-99.5 3.5-12.8 5.5-26.2 5.5-40.1C434 52 382 4 318 4c-53 0-97.4 33-112.5 78.4C190.1 79.1 174.5 78 158 78c-44.2 0-80 35.8-80 80 0 17 5.3 32.7 14.3 45.7l-49.1 36.8C25.5 253.3 16 273.9 16 295.6V352c0 26.5 21.5 48 48 48h22.9C104.1 464.3 161.4 508 228 508c105.7 0 193-81.5 203.2-184.9 24.3-11.8 40.8-36.4 40.8-67.1zM158 110c17.7 0 32 14.3 32 32s-14.3 32-32 32-32-14.3-32-32 14.3-32 32-32zm30 186c-16.6 0-30-13.4-30-30s13.4-30 30-30 30 13.4 30 30-13.4 30-30 30z"/></svg></i>
+                            </div>
+                            <span class="text-[10px] bg-slate-950 px-2 py-0.5 rounded text-white font-semibold shadow border border-gray-700 truncate max-w-[80px]">
+                                ${name}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // GAME 6: Render mưa tên tĩnh ban đầu
+        function renderRainStatic() {
+            const list = document.getElementById('rainNamesList');
+            if (!list) return;
+
+            const items = state.students.slice(0, 15);
+            list.innerHTML = items.map(name => `
+                <span class="bg-gray-800 text-gray-400 px-2.5 py-1 rounded-full border border-gray-700 text-xs">
+                    ${name}
+                </span>
+            `).join('');
+        }
+
+        // GAME 7: Render bong bóng tĩnh ban đầu
+        function renderBubbleGrid(isPopping = false) {
+            const grid = document.getElementById('bubbleGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const list = state.students.slice(0, 8); // Tối đa 8 quả bong bóng dễ quan sát
+            const colors = ['bg-pink-500/20 text-pink-400 border-pink-500', 'bg-blue-500/20 text-blue-400 border-blue-500', 'bg-yellow-500/20 text-yellow-400 border-yellow-500', 'bg-purple-500/20 text-purple-400 border-purple-500', 'bg-emerald-500/20 text-emerald-400 border-emerald-500', 'bg-indigo-500/20 text-indigo-400 border-indigo-500'];
+
+            list.forEach((name, i) => {
+                grid.innerHTML += `
+                    <div id="bubble-${i}" class="${colors[i % colors.length]} border-2 w-16 h-16 rounded-full flex flex-col items-center justify-center p-1 text-center shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300">
+                        <i class="fa-solid fa-circle text-[6px] animate-ping"></i>
+                        <span class="text-[9px] font-bold truncate w-full">${name}</span>
+                    </div>
+                `;
+            });
+        }
+
+
+        /* ==================== CƠ CHẾ CHỌN HỌC SINH THÔNG MINH ==================== */
+        function pickRandomStudent() {
+            if (state.students.length === 0) return null;
+
+            if (state.noRepeat) {
+                // Lọc những em chưa được gọi
+                const available = state.students.filter(name => !state.calledIds.includes(name));
+                
+                if (available.length === 0) {
+                    // Nếu đã gọi hết cả lớp, tự động đặt lại vòng lặp mới từ đầu
+                    state.calledIds = [];
+                    alertMessage("Vòng lặp mới: Tất cả học sinh đã được gọi ít nhất một lần!", "success");
+                    return pickRandomStudent(); // Gọi đệ quy lại
+                }
+
+                // Chọn ngẫu nhiên trong danh sách chưa gọi
+                const picked = available[Math.floor(Math.random() * available.length)];
+                state.calledIds.push(picked);
+                saveStateToLocalStorage();
+                refreshStats();
+                return picked;
+            } else {
+                // Random hoàn toàn tự do
+                const picked = state.students[Math.floor(Math.random() * state.students.length)];
+                // Vẫn ghi nhận số lượng gọi độc lập
+                if (!state.calledIds.includes(picked)) {
+                    state.calledIds.push(picked);
+                }
+                saveStateToLocalStorage();
+                refreshStats();
+                return picked;
+            }
+        }
+
+        /* ==================== KÍCH HOẠT QUAY RANDOM THEO TỪNG CHẾ ĐỘ (CORE) ==================== */
+        function triggerRandomAction() {
+            if (state.isRunning) return;
+            if (state.students.length === 0) {
+                alertMessage("Hãy cập nhật danh sách lớp trước khi tiến hành quay!", "error");
+                return;
+            }
+
+            state.isRunning = true;
+            document.getElementById('btnTriggerRandom').disabled = true;
+            document.getElementById('btnTriggerRandom').classList.add('opacity-50', 'cursor-not-allowed');
+
+            const winner = pickRandomStudent();
+            if (!winner) {
+                state.isRunning = false;
+                return;
+            }
+
+            // Kích hoạt animation của game tương ứng
+            executeGameAnimation(state.selectedGameId, winner);
+        }
+
+        function executeGameAnimation(gameId, winner) {
+            switch(gameId) {
+                case 1: // ANIMATION VÒNG QUAY MAY MẮN
+                    let rotation = 0;
+                    const spinDuration = 3500; // 3.5 giây quay
+                    const startTime = performance.now();
+                    
+                    playSoundEffects('drumroll');
+
+                    function animateWheel(time) {
+                        const elapsed = time - startTime;
+                        const progress = Math.min(elapsed / spinDuration, 1);
+                        
+                        // Hàm giảm tốc đẹp mắt (ease-out cubic)
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+                        rotation = easeOut * 3600; // Quay nhiều vòng
+
+                        const canvas = document.getElementById('wheelCanvas');
+                        if (canvas) {
+                            canvas.style.transform = `rotate(${rotation}deg)`;
+                            playSoundEffects('tick');
+                            if (progress < 1) {
+                                requestAnimationFrame(animateWheel);
+                            } else {
+                                concludeGameResult("Vòng quay may mắn", winner);
+                            }
+                        }
+                    }
+                    requestAnimationFrame(animateWheel);
+                    break;
+
+                case 2: // ANIMATION ĐƯỜNG ĐUA VỊT VÀNG
+                    playSoundEffects('drumroll');
+                    // Ta render các chú vịt tham gia đường đua và cho chạy tăng tốc
+                    renderDuckLanes(true);
+                    
+                    const raceTrack = document.getElementById('duckRaceTrack');
+                    const raceDuration = 4000; // Đua 4 giây
+                    const raceStart = performance.now();
+                    
+                    // Thêm chú vịt đại diện người chiến thắng vào đường đua nếu chưa có
+                    const list = state.students.slice(0, 8);
+                    let winnerIndex = list.indexOf(winner);
+                    
+                    if (winnerIndex === -1) {
+                        // Nếu học sinh chiến thắng không có trong top 8 hiển thị ban đầu, thế vị trí đầu tiên
+                        winnerIndex = 0;
+                        const firstDuckLabel = document.querySelector('#duckItem-0 span');
+                        if (firstDuckLabel) firstDuckLabel.textContent = winner;
+                    }
+
+                    function animateRace(time) {
+                        const elapsed = time - raceStart;
+                        const progress = Math.min(elapsed / raceDuration, 1);
+
+                        for (let i = 0; i < Math.min(list.length, 8); i++) {
+                            const duck = document.getElementById(`duckItem-${i}`);
+                            if (duck) {
+                                let position = 0;
+                                if (i === winnerIndex) {
+                                    // Chú vịt chiến thắng sẽ về đích trước
+                                    position = progress * 80; // chạy đến 80% chiều ngang
+                                } else {
+                                    // Chú vịt khác chạy lung tung bứt tốc không đều
+                                    const randomFactor = Math.sin(time * 0.05 + i) * 10;
+                                    position = Math.min(progress * 65 + randomFactor, 72); 
+                                }
+                                duck.style.left = `${position}%`;
+                            }
+                        }
+
+                        if (progress < 1) {
+                            if (Math.random() < 0.1) playSoundEffects('tick');
+                            requestAnimationFrame(animateRace);
+                        } else {
+                            concludeGameResult("Đua Vịt Vàng", winner);
+                        }
+                    }
+                    requestAnimationFrame(animateRace);
+                    break;
+
+                case 3: // ANIMATION SLOT MACHINE
+                    playSoundEffects('drumroll');
+                    const jackpot = document.getElementById('jackpotContainer');
+                    if (!jackpot) { concludeGameResult("Máy Jackpot", winner); return; }
+
+                    // Sinh danh sách tên chạy liên tiếp
+                    let listItemsHtml = '';
+                    // Tạo một chuỗi danh sách tên chạy liên tục dồn dập
+                    const pool = [...state.students, ...state.students, winner];
+                    pool.forEach(name => {
+                        listItemsHtml += `<div class="h-16 flex items-center justify-center font-bold text-lg text-neonOrange font-digital uppercase px-4 whitespace-nowrap">${name}</div>`;
+                    });
+                    jackpot.innerHTML = listItemsHtml;
+
+                    let currentOffset = 0;
+                    const finalOffset = - (pool.length - 1) * 64; // Mỗi item cao 64px (h-16)
+                    const jackDuration = 3500;
+                    const jackStart = performance.now();
+
+                    function animateJackpot(time) {
+                        const elapsed = time - jackStart;
+                        const progress = Math.min(elapsed / jackDuration, 1);
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+                        
+                        currentOffset = easeOut * finalOffset;
+                        jackpot.style.top = `${currentOffset}px`;
+                        
+                        playSoundEffects('tick');
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animateJackpot);
+                        } else {
+                            concludeGameResult("Máy Jackpot", winner);
+                        }
+                    }
+                    requestAnimationFrame(animateJackpot);
+                    break;
+
+                case 4: // ANIMATION XÚC XẮC (ĐÃ ĐƯỢC SỬA LỖI HIỂN THỊ TÊN)
+                    playSoundEffects('drumroll');
+                    const dice = document.getElementById('dice3D');
+                    const diceName = document.getElementById('diceWinnerName');
+                    if (!dice) { concludeGameResult("Xúc xắc may rủi", winner); return; }
+
+                    dice.classList.add('shaking');
+                    if (diceName) {
+                        diceName.classList.remove('text-neonGreen', 'text-neon-green');
+                        diceName.classList.add('text-neonOrange');
+                    }
+                    
+                    let diceCounter = 0;
+                    const diceFaces = [
+                        '<i class="fa-solid fa-dice-one"></i>',
+                        '<i class="fa-solid fa-dice-two"></i>',
+                        '<i class="fa-solid fa-dice-three"></i>',
+                        '<i class="fa-solid fa-dice-four"></i>',
+                        '<i class="fa-solid fa-dice-five"></i>',
+                        '<i class="fa-solid fa-dice-six"></i>'
+                    ];
+
+                    // Tạo hiệu ứng tráo đổi tên các học sinh khác liên tục khi xúc xắc đang lắc
+                    const diceInterval = setInterval(() => {
+                        dice.innerHTML = diceFaces[diceCounter % 6];
+                        if (diceName && state.students.length > 0) {
+                            const randomTempName = state.students[Math.floor(Math.random() * state.students.length)];
+                            diceName.textContent = randomTempName;
+                        }
+                        diceCounter++;
+                        playSoundEffects('tick');
+                    }, 100);
+
+                    setTimeout(() => {
+                        clearInterval(diceInterval);
+                        dice.classList.remove('shaking');
+                        
+                        // Hiển thị một mặt xúc xắc ngẫu nhiên cuối cùng
+                        const finalFace = Math.floor(Math.random() * 6);
+                        dice.innerHTML = diceFaces[finalFace];
+                        
+                        // Khóa tên học sinh trúng thưởng và kích hoạt hiệu ứng Neon
+                        if (diceName) {
+                            diceName.textContent = winner;
+                            diceName.classList.remove('text-neonOrange', 'scale-95', 'opacity-65');
+                            diceName.classList.add('text-neonGreen', 'scale-110', 'opacity-100', 'text-neon-green');
+                        }
+                        
+                        playSoundEffects('win');
+                        
+                        // Dừng lại 1.2s cho cả lớp nhìn thấy kết quả ngay trong bảng game trước khi hiện Modal chúc mừng lớn
+                        setTimeout(() => {
+                            concludeGameResult("Xúc xắc may rủi", winner);
+                        }, 1200);
+                    }, 2500);
+                    break;
+
+                case 5: // ANIMATION PHÓNG PHI TIÊU
+                    playSoundEffects('launch');
+                    const dart = document.getElementById('dartProjectile');
+                    if (!dart) { concludeGameResult("Phóng phi tiêu", winner); return; }
+
+                    // Đặt lại tọa độ phi tiêu phóng vèo
+                    dart.style.opacity = '1';
+                    dart.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+                    
+                    setTimeout(() => {
+                        // Hiệu ứng cắm phập vào hồng tâm
+                        dart.style.transform = 'translate(60px, -60px) rotate(35deg) scale(0.8)';
+                        playSoundEffects('win');
+                        
+                        // Hiển thị tên trúng mục tiêu ngay hồng tâm
+                        const ring = document.getElementById('dartboardRing');
+                        if (ring) {
+                            ring.innerHTML = `
+                                <div class="text-center p-4 bg-slate-950/90 border-2 border-neonOrange rounded-2xl animate-bounce z-20 shadow-2xl">
+                                    <p class="text-xs text-neonGreen font-bold tracking-wider uppercase mb-1">TRÚNG HỒNG TÂM!</p>
+                                    <h4 class="font-extrabold text-white text-lg">${winner}</h4>
+                                </div>
+                            `;
+                        }
+                    }, 800);
+
+                    setTimeout(() => {
+                        concludeGameResult("Phóng phi tiêu", winner);
+                    }, 2800);
+                    break;
+
+                case 6: // ANIMATION CƠN MƯA TÊN HỌC SINH
+                    playSoundEffects('drumroll');
+                    const rainContainer = document.getElementById('rainContainer');
+                    if (!rainContainer) { concludeGameResult("Mưa tên học sinh", winner); return; }
+
+                    // Xóa danh sách tĩnh, tạo các thẻ rơi tự do liên tục cực bắt mắt
+                    rainContainer.innerHTML = '';
+                    const durationRain = 3000;
+                    const rainStart = performance.now();
+                    const rainInterval = setInterval(() => {
+                        const randomName = state.students[Math.floor(Math.random() * state.students.length)];
+                        const element = document.createElement('div');
+                        element.className = "absolute text-xs bg-slate-800 border border-gray-700 text-gray-300 font-bold px-3 py-1 rounded-full shadow-lg transition-all ease-linear";
+                        element.style.left = `${Math.random() * 80}%`;
+                        element.style.top = `-20px`;
+                        element.textContent = randomName;
+                        rainContainer.appendChild(element);
+
+                        // Rơi xuống
+                        setTimeout(() => {
+                            element.style.top = `280px`;
+                            element.style.opacity = '0';
+                        }, 50);
+
+                        // Hủy
+                        setTimeout(() => element.remove(), 2000);
+                        playSoundEffects('tick');
+                    }, 120);
+
+                    setTimeout(() => {
+                        clearInterval(rainInterval);
+                        // Biển người chiến thắng xuất hiện ở giữa to đùng
+                        rainContainer.innerHTML = `
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/80">
+                                <div class="text-center p-6 border-2 border-neonOrange bg-slate-900 rounded-3xl animate-bounce shadow-2xl">
+                                    <span class="text-xs text-neonGreen font-bold block uppercase tracking-widest mb-1">Mưa tên hội tụ</span>
+                                    <h2 class="text-2xl font-black text-white">${winner}</h2>
+                                </div>
+                            </div>
+                        `;
+                        playSoundEffects('win');
+                        setTimeout(() => {
+                            concludeGameResult("Mưa tên học sinh", winner);
+                        }, 1200);
+                    }, durationRain);
+                    break;
+
+                case 7: // ANIMATION BẮN BONG BÓNG
+                    playSoundEffects('drumroll');
+                    renderBubbleGrid(true);
+
+                    // Chọn ngẫu nhiên một bong bóng để nổ
+                    const totalBubbles = Math.min(state.students.length, 8);
+                    const luckyIndex = Math.floor(Math.random() * totalBubbles);
+                    const luckyBubble = document.getElementById(`bubble-${luckyIndex}`);
+
+                    // Đảm bảo bong bóng chiến thắng hiển thị đúng tên người thắng trước khi kích nổ
+                    if (luckyBubble) {
+                        const nameSpan = luckyBubble.querySelector('span');
+                        if (nameSpan) nameSpan.textContent = winner;
+                    }
+
+                    setTimeout(() => {
+                        if (luckyBubble) {
+                            // Biến đổi nổ bóng
+                            luckyBubble.innerHTML = `<span class="text-2xl">💥</span>`;
+                            luckyBubble.className = "bg-rose-600 border-2 border-white text-white w-16 h-16 rounded-full flex items-center justify-center p-1 text-center shadow-2xl bubble-pop";
+                            playSoundEffects('pop');
+                        }
+                    }, 1500);
+
+                    setTimeout(() => {
+                        concludeGameResult("Bắn bong bóng", winner);
+                    }, 3000);
+                    break;
+
+                case 8: // ANIMATION THƯ BÍ ẨN
+                    playSoundEffects('drumroll');
+                    const wrapper = document.getElementById('envelopeWrapper');
+                    const cap = document.getElementById('envelopeCap');
+                    const letter = document.getElementById('secretLetter');
+
+                    if (!wrapper) { concludeGameResult("Thư bí ẩn", winner); return; }
+
+                    // Bước 1: Mở nắp thư
+                    setTimeout(() => {
+                        wrapper.classList.add('envelope-open');
+                        playSoundEffects('tick');
+                    }, 1000);
+
+                    // Bước 2: Kéo thư lên và hiện tên học sinh
+                    setTimeout(() => {
+                        if (letter) {
+                            letter.innerHTML = `<p class="text-[10px] text-neonOrange font-bold tracking-wider">HỌC SINH ĐƯỢC CHỌN</p><p class="text-sm font-black text-slate-950">${winner}</p>`;
+                            letter.style.opacity = '1';
+                            letter.style.transform = 'translateY(-60px) scale(1.1)';
+                            playSoundEffects('win');
+                        }
+                    }, 1800);
+
+                    setTimeout(() => {
+                        concludeGameResult("Thư bí ẩn", winner);
+                    }, 3500);
+                    break;
+            }
+        }
+
+        function concludeGameResult(gameName, winnerName) {
+            // Lưu vào lịch sử và phát âm thanh chiến thắng
+            addHistory(winnerName, gameName);
+            playSoundEffects('win');
+
+            // Hiển thị modal kết quả
+            openWinnerModal(winnerName, gameName);
+
+            // Bật hiệu ứng pháo hoa kéo dài 3 giây
+            initFireworks();
+
+            // Mở khóa cho phép quay tiếp lần sau
+            state.isRunning = false;
+            document.getElementById('btnTriggerRandom').disabled = false;
+            document.getElementById('btnTriggerRandom').classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            // Vẽ lại trạng thái ban đầu của game
+            selectGame(state.selectedGameId);
+        }
+
+        /* ==================== HIỂU ỨNG PHÁO HOA CHÚC MỪNG (FIREWORKS CANVAS) ==================== */
+        let particles = [];
+        let fireworkAnimationId = null;
+
+        function initFireworks() {
+            const canvas = document.getElementById('fireworksCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            particles = [];
+            
+            // Tạo các chòm sao pháo hoa từ giữa màn hình bắn ra xung quanh
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: centerX,
+                    y: centerY,
+                    angle: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 8 + 3,
+                    radius: Math.random() * 3 + 1,
+                    color: `hsla(${Math.random() * 360}, 100%, 60%, 1)`,
+                    alpha: 1,
+                    decay: Math.random() * 0.015 + 0.005
+                });
+            }
+
+            if (fireworkAnimationId) cancelAnimationFrame(fireworkAnimationId);
+            animateFireworks();
+        }
+
+        function animateFireworks() {
+            const canvas = document.getElementById('fireworksCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let alive = false;
+            particles.forEach(p => {
+                if (p.alpha > 0) {
+                    p.x += Math.cos(p.angle) * p.speed;
+                    p.y += Math.sin(p.angle) * p.speed + 0.5; // Thêm trọng lực nhẹ rơi xuống
+                    p.alpha -= p.decay;
+                    
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                    ctx.restore();
+                    
+                    alive = true;
+                }
+            });
+
+            if (alive) {
+                fireworkAnimationId = requestAnimationFrame(animateFireworks);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // Đảm bảo responsive canvas pháo hoa khi thay đổi kích thước trình duyệt
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('fireworksCanvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+
+
+        /* ==================== ĐIỀU KHIỂN POPUP CHIẾN THẮNG (WINNER MODAL) ==================== */
+        function openWinnerModal(winnerName, gameName) {
+            const modal = document.getElementById('winnerModal');
+            const card = document.getElementById('winnerModalCard');
+            const nameField = document.getElementById('modalWinnerName');
+            const titleField = document.getElementById('modalSubTitle');
+
+            titleField.textContent = `CHẾ ĐỘ GỌI: ${gameName}`;
+            nameField.textContent = winnerName;
+
+            // Bật modal
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                card.classList.remove('scale-90', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeWinnerModal() {
+            const modal = document.getElementById('winnerModal');
+            const card = document.getElementById('winnerModalCard');
+
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-90', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            }, 300); // 300ms sau khi animation ẩn kết thúc
+
+            // Dọn dẹp pháo hoa
+            if (fireworkAnimationId) {
+                cancelAnimationFrame(fireworkAnimationId);
+                const canvas = document.getElementById('fireworksCanvas');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
